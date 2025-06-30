@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTutor AI - Personalized Learning Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .content-panel {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .content-panel.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .google-btn {
+            background: white;
+            color: #4285f4;
+            border: 2px solid #4285f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .google-btn:hover {
+            background: #4285f4;
+            color: white;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .course-card {
+            background: linear-gradient(135deg, #f7fafc, #e2e8f0);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .course-card h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .course-card p {
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .quiz-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #f7fafc, #e2e8f0);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid #48bb78;
+        }
+
+        .question-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .option {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .option.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .option.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f7fafc, #e2e8f0);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border-top: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-list {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .student-item:hover {
+            background: #f7fafc;
+        }
+
+        .student-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .student-score {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            border: 1px solid #48bb78;
+            color: #2f855a;
+        }
+
+        .alert-error {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid #f56565;
+            color: #c53030;
+        }
+
+        .alert-info {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid #667eea;
+            color: #553c9a;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .diagnostic-intro {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .diagnostic-intro h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .diagnostic-intro p {
+            color: #718096;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .feedback-panel {
+            background: linear-gradient(135deg, #f7fafc, #e2e8f0);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #48bb78;
+        }
+
+        .feedback-panel h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .feedback-panel p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 EduTutor AI</h1>
+            <p>Personalized Learning with Generative AI and LMS Integration</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showPanel('login')">🔐 Authentication</div>
+            <div class="nav-tab" onclick="showPanel('educator')">👨‍🏫 Educator Dashboard</div>
+            <div class="nav-tab" onclick="showPanel('integration')">🔗 Google Classroom</div>
+        </div>
+
+        <!-- Authentication Panel -->
+        <div id="login" class="content-panel active">
+            <div class="auth-form">
+                <h2 style="text-align: center; color: #4a5568; margin-bottom: 30px;">Welcome to EduTutor AI</h2>
+                
+                <div class="form-group">
+                    <label>User Type</label>
+                    <select id="userType" onchange="updateAuthForm()">
+                        <option value="student">Student</option>
+                        <option value="educator">Educator</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="name" id="email" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter your password">
+                </div>
+           <button class="btn btn-full" onclick="login()">Sign In / Register</button>
+
+                <div id="authMessage" class="alert hidden"></div>
+            </div>
+        </div>
+
+
+        <!-- Educator Dashboard -->
+        <div id="educator" class="content-panel">
+            <h2 style="color: #4a5568; margin-bottom: 20px;">👨‍🏫 Educator Dashboard</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalStudents">0</div>
+                    <div class="stat-label">Active Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCourses">0</div>
+                    <div class="stat-label">Courses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgClassScore">0%</div>
+                    <div class="stat-label">Class Average</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completionRate">0%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+                <div class="chart-container">
+                    <h3 style="color: #4a5568; margin-bottom: 20px;">📊 Class Performance</h3>
+                    <canvas id="classPerformanceChart" width="400" height="300"></canvas>
+                </div>
+
+                <div class="student-list">
+                    <h3 style="color: #4a5568; padding: 20px; margin: 0; border-bottom: 1px solid #e2e8f0;">Recent Quiz Results</h3>
+                    <div id="studentResults">
+                        <!-- Student results will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 style="color: #4a5568; margin-bottom: 20px;">📈 Learning Progress Trends</h3>
+                <canvas id="progressTrendsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Google Classroom Integration -->
+      <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+        }
+
+        .subject-selector {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .subject-selector h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .subject-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .subject-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .subject-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .subject-btn.active {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .video-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .video-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .video-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+            position: relative;
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .video-duration {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .video-player {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .video-player.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .video-frame {
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .video-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            background: linear-gradient(45deg, #9C27B0, #673AB7);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+        }
+
+        .quiz-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .quiz-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .quiz-header h3 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .generating-quiz {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .question {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            background: #f5f5f5;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+
+        .option.selected {
+            background: #2196F3;
+            color: white;
+            border-color: #1976D2;
+        }
+
+        .submit-quiz {
+            background: linear-gradient(45deg, #FF5722, #E64A19);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: block;
+            margin: 20px auto;
+            transition: all 0.3s ease;
+        }
+
+        .submit-quiz:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 87, 34, 0.3);
+        }
+
+        .back-btn {
+            background: linear-gradient(45deg, #607D8B, #455A64);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(96, 125, 139, 0.3);
+        }
+
+        .sync-status {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            color: #2E7D32;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .subject-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-frame {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="integration" class="content-panel">
+        <div class="subject-selector" id="subjectSelector">
+            <h2>📚 Select Your Subject</h2>
+            <div class="subject-buttons">
+                <button class="subject-btn" onclick="showSubject('mathematics')">📊 Mathematics</button>
+                <button class="subject-btn" onclick="showSubject('science')">🔬 Science</button>
+                <button class="subject-btn" onclick="showSubject('history')">📜 History</button>
+            </div>
+        </div>
+
+        <!-- Mathematics Section -->
+        <div class="video-section" id="mathematics">
+            <h3>📊 Mathematics Video</h3>
+            <div class="video-grid">
+                <div class="video-card" onclick="playVideo('mathematics', 'main')">
+                    <div class="video-thumbnail">
+                        📈
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Introduction to Algebra</div>
+                        <div class="video-duration">Duration: 15 minutes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Science Section -->
+        <div class="video-section" id="science">
+            <h3>🔬 Science Video</h3>
+            <div class="video-grid">
+                <div class="video-card" onclick="playVideo('science', 'main')">
+                    <div class="video-thumbnail">
+                        ⚛
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Newton's Laws of Motion</div>
+                        <div class="video-duration">Duration: 12 minutes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="video-section" id="history">
+            <h3>📜 History Video</h3>
+            <div class="video-grid">
+                <div class="video-card" onclick="playVideo('history', 'main')">
+                    <div class="video-thumbnail">
+                        🏛
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Ancient Egypt Overview</div>
+                        <div class="video-duration">Duration: 18 minutes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Player -->
+        <div class="video-player" id="videoPlayer">
+            <button class="back-btn" onclick="backToSubjects()">← Back to Videos</button>
+            <div class="sync-status">
+                🔄 Synced with EduTutor AI - Quiz generation enabled
+            </div>
+            <h3 id="currentVideoTitle">Video Player</h3>
+            <div class="video-frame" id="videoFrame">
+                🎬 Video is now playing...
+            </div>
+            <div class="video-controls">
+                <button class="control-btn" onclick="controlVideo('play')">▶ Play</button>
+                <button class="control-btn" onclick="controlVideo('pause')">⏸ Pause</button>
+                <button class="control-btn" onclick="controlVideo('restart')">🔄 Restart</button>
+                <button class="control-btn" onclick="generateQuiz()">🧠 Generate Quiz</button>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="quiz-section" id="quizSection">
+            <button class="back-btn" onclick="backToVideo()">← Back to Video</button>
+            <div class="quiz-header">
+                <h3>🧠 AI-Generated Quiz</h3>
+                <p>Based on the video content you just watched</p>
+            </div>
+            <div id="quizContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSubject = '';
+        let currentVideo = '';
+        
+        // Video URLs - Replace these with your own video links
+        const videoUrls = {
+            mathematics: {
+                main: 'https://www.youtube.com/embed/5Q0FlxcEEIw' // Introduction to Algebra (verified working)
+            },
+            science: {
+                main: 'https://www.youtube.com/embed/kKKM8Y-u7ds' // Newton's Laws (verified working)
+            },
+            history: {
+                main: 'https://www.youtube.com/embed/Z3Wvw6BivVI' // Ancient Egypt (verified working)
+            }
+        };
+        
+        let videoData = {
+            mathematics: {
+                main: {
+                    title: 'Introduction to Algebra',
+                    questions: [
+                        {
+                            question: 'What is the value of x in the equation 2x + 6 = 14?',
+                            options: ['x = 2', 'x = 4', 'x = 6', 'x = 8'],
+                            correct: 1
+                        },
+                        {
+                            question: 'Which property allows us to write a(b + c) = ab + ac?',
+                            options: ['Commutative Property', 'Associative Property', 'Distributive Property', 'Identity Property'],
+                            correct: 2
+                        },
+                        {
+                            question: 'What is an algebraic expression?',
+                            options: ['A number', 'An equation', 'A combination of numbers and variables', 'A graph'],
+                            correct: 2
+                        },
+                        {
+                            question: 'In the expression 5x + 3, what is the coefficient of x?',
+                            options: ['3', '5', '8', 'x'],
+                            correct: 1
+                        },
+                        {
+                            question: 'What is the first step to solve 3x - 9 = 12?',
+                            options: ['Divide by 3', 'Add 9 to both sides', 'Subtract 3', 'Multiply by 12'],
+                            correct: 1
+                        }
+                    ]
+                }
+            },
+            science: {
+                main: {
+                    title: 'Newton\'s Laws of Motion',
+                    questions: [
+                        {
+                            question: 'What is Newton\'s First Law of Motion also known as?',
+                            options: ['Law of Acceleration', 'Law of Inertia', 'Law of Action-Reaction', 'Law of Gravity'],
+                            correct: 1
+                        },
+                        {
+                            question: 'According to Newton\'s Second Law, Force equals:',
+                            options: ['Mass × Velocity', 'Mass × Acceleration', 'Velocity × Time', 'Distance × Time'],
+                            correct: 1
+                        },
+                        {
+                            question: 'Newton\'s Third Law states that:',
+                            options: ['Objects at rest stay at rest', 'F = ma', 'For every action, there is an equal and opposite reaction', 'Speed is constant'],
+                            correct: 2
+                        },
+                        {
+                            question: 'What is the unit of force in the SI system?',
+                            options: ['Joule', 'Newton', 'Pascal', 'Watt'],
+                            correct: 1
+                        },
+                        {
+                            question: 'If you push a wall with 10N of force, how much force does the wall push back?',
+                            options: ['0N', '5N', '10N', '20N'],
+                            correct: 2
+                        }
+                    ]
+                }
+            },
+            history: {
+                main: {
+                    title: 'Ancient Egypt Overview',
+                    questions: [
+                        {
+                            question: 'Which river was essential to ancient Egyptian civilization?',
+                            options: ['Euphrates River', 'Nile River', 'Amazon River', 'Mississippi River'],
+                            correct: 1
+                        },
+                        {
+                            question: 'What were the rulers of ancient Egypt called?',
+                            options: ['Kings', 'Emperors', 'Pharaohs', 'Presidents'],
+                            correct: 2
+                        },
+                        {
+                            question: 'What is the most famous pyramid in Egypt?',
+                            options: ['Pyramid of Khafre', 'Great Pyramid of Giza', 'Step Pyramid', 'Red Pyramid'],
+                            correct: 1
+                        },
+                        {
+                            question: 'What material did ancient Egyptians use to make paper?',
+                            options: ['Wood', 'Cotton', 'Papyrus', 'Silk'],
+                            correct: 2
+                        },
+                        {
+                            question: 'What process did Egyptians use to preserve dead bodies?',
+                            options: ['Cremation', 'Burial', 'Mummification', 'Freezing'],
+                            correct: 2
+                        }
+                    ]
+                }
+            }
+        };
+
+        function showSubject(subject) {
+            // Hide all sections
+            document.querySelectorAll('.video-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected subject
+            document.getElementById(subject).classList.add('active');
+            
+            // Update button states
+            document.querySelectorAll('.subject-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentSubject = subject;
+        }
+
+        function playVideo(subject, video) {
+            currentSubject = subject;
+            currentVideo = video;
+            
+            // Hide subject selector and video sections
+            document.getElementById('subjectSelector').style.display = 'none';
+            document.querySelectorAll('.video-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show video player
+            document.getElementById('videoPlayer').classList.add('active');
+            document.getElementById('currentVideoTitle').textContent = videoData[subject][video].title;
+            
+            // Load actual video
+            const videoUrl = videoUrls[subject][video];
+            console.log('Loading video:', videoUrl); // Debug log
+            
+            if (videoUrl) {
+                document.getElementById('videoFrame').innerHTML = `
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src="${videoUrl}?autoplay=1" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen
+                        style="border-radius: 10px;">
+                    </iframe>
+                `;
+            } else {
+                document.getElementById('videoFrame').innerHTML = `
+                    <div style="text-align: center; color: white;">
+                        <h3>❌ Video not found</h3>
+                        <p>Please check the video URL for ${subject} - ${video}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function controlVideo(action) {
+            const videoFrame = document.getElementById('videoFrame');
+            const iframe = videoFrame.querySelector('iframe');
+            
+            switch(action) {
+                case 'play':
+                    // Note: Direct iframe control requires postMessage API for YouTube
+                    alert('🎬 Video controls: Use the video player controls directly');
+                    break;
+                case 'pause':
+                    alert('⏸ Video controls: Use the video player controls directly');
+                    break;
+                case 'restart':
+                    // Reload the iframe to restart
+                    if (iframe) {
+                        const currentSrc = iframe.src;
+                        iframe.src = currentSrc;
+                    }
+                    break;
+            }
+        }
+
+        function generateQuiz() {
+            document.getElementById('videoPlayer').style.display = 'none';
+            document.getElementById('quizSection').classList.add('active');
+            
+            // Show loading state
+            document.getElementById('quizContent').innerHTML = `
+                <div class="generating-quiz">
+                    <div class="spinner"></div>
+                    <h4>🤖 EduTutor AI is analyzing video content...</h4>
+                    <p>Generating personalized quiz questions based on the video</p>
+                </div>
+            `;
+            
+            // Simulate AI processing time
+            setTimeout(() => {
+                displayQuiz();
+            }, 3000);
+        }
+
+        function displayQuiz() {
+            const questions = videoData[currentSubject][currentVideo].questions;
+            let quizHTML = '';
+            
+            questions.forEach((q, index) => {
+                quizHTML += `
+                    <div class="question">
+                        <div class="question-text">Question ${index + 1}: ${q.question}</div>
+                        <div class="options">
+                            ${q.options.map((option, optIndex) => `
+                                <div class="option" onclick="selectOption(${index}, ${optIndex})" data-question="${index}" data-option="${optIndex}">
+                                    ${String.fromCharCode(65 + optIndex)}. ${option}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            quizHTML += '<button class="submit-quiz" onclick="submitQuiz()">Submit Quiz 📝</button>';
+            
+            document.getElementById('quizContent').innerHTML = quizHTML;
+        }
+
+        function selectOption(questionIndex, optionIndex) {
+            // Remove previous selections for this question
+            document.querySelectorAll([data-question="${questionIndex}"]).forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            event.target.classList.add('selected');
+        }
+
+        function submitQuiz() {
+            const questions = videoData[currentSubject][currentVideo].questions;
+            const selectedOptions = document.querySelectorAll('.option.selected');
+            let score = 0;
+            let results = [];
+            
+            questions.forEach((q, index) => {
+                const selectedOption = document.querySelector([data-question="${index}"].selected);
+                if (selectedOption) {
+                    const selectedIndex = parseInt(selectedOption.dataset.option);
+                    if (selectedIndex === q.correct) {
+                        score++;
+                        results.push({ question: index, correct: true });
+                    } else {
+                        results.push({ question: index, correct: false, selected: selectedIndex, correct_answer: q.correct });
+                    }
+                }
+            });
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            alert(🎉 Quiz Completed!\n\nScore: ${score}/${questions.length} (${percentage}%)\n\n${percentage >= 70 ? 'Great job! You understood the video content well.' : 'Consider reviewing the video again to improve your understanding.'});
+        }
+
+        function backToVideo() {
+            document.getElementById('quizSection').classList.remove('active');
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('videoPlayer').style.display = 'block';
+        }
+
+        function backToSubjects() {
+            document.getElementById('videoPlayer').classList.remove('active');
+            document.getElementById('videoPlayer').style.display = 'none';
+            document.getElementById('subjectSelector').style.display = 'block';
+            document.querySelectorAll('.video-section').forEach(section => {
+                section.style.display = 'block';
+                if (section.id === currentSubject) {
+                    section.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+
+    <script>
+        // Global state management
+        let currentUser = null;
+        let currentQuiz = null;
+        let questionIndex = 0;
+        let studentData = {
+            quizzes: [],
+            courses: [],
+            performance: [],
+            diagnosticComplete: false
+        };
+
+        // Sample data for demonstration
+        const sampleQuestions = [
+            {
+                question: "What is the derivative of x²?",
+                options: ["2x", "x", "2", "x²"],
+                correct: 0,
+                explanation: "The derivative of x² is 2x using the power rule."
+            },
+            {
+                question: "Which of the following is a prime number?",
+                options: ["15", "21", "17", "25"],
+                correct: 2,
+                explanation: "17 is prime because it's only divisible by 1 and itself."
+            },
+            {
+                question: "What is the capital of France?",
+                options: ["London", "Berlin", "Paris", "Madrid"],
+                correct: 2,
+                explanation: "Paris is the capital and largest city of France."
+            }
+        ];
+
+        const sampleCourses = [
+            { name: "Advanced Mathematics", teacher: "Dr. Smith", students: 25, avgScore: 85 },
+            { name: "Physics 101", teacher: "Prof. Johnson", students: 30, avgScore: 78 },
+            { name: "Chemistry", teacher: "Ms. Davis", students: 22, avgScore: 92 },
+            { name: "Biology", teacher: "Dr. Wilson", students: 28, avgScore: 88 }
+        ];
+
+        // Navigation functions
+        function showPanel(panelId) {
+            // Hide all panels
+            document.querySelectorAll('.content-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected panel
+            document.getElementById(panelId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+
+            // Initialize panel-specific content
+            if (panelId === 'educator') {
+                initializeEducatorDashboard();
+            } else if (panelId === 'integration') {
+                initializeIntegrationPanel();
+            }
+        }
+
+        // Authentication functions
+        function updateAuthForm() {
+            const userType = document.getElementById('userType').value;
+            const studentFields = document.getElementById('studentFields');
+            
+            if (userType === 'student') {
+                studentFields.style.display = 'block';
+            } else {
+                studentFields.style.display = 'none';
+            }
+        }
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+            
+            if (!email || !password) {
+                showMessage('authMessage', 'Please fill in all fields', 'error');
+                return;
+            }
+
+            // Simulate authentication
+            currentUser = {
+                email: email,
+                type: userType,
+                name: email.split('@')[0],
+                gradeLevel: document.getElementById('gradeLevel').value,
+                learningStyle: document.getElementById('learningStyle').value
+            };
+
+            showMessage('authMessage', 'Login successful! Welcome to EduTutor AI.', 'success');
+            
+            // Auto-switch to appropriate panel
+            setTimeout(() => {
+                if (userType === 'student') {
+                    showPanel('student');
+                } else {
+                    showPanel('educator');
+                }
+            }, 1500);
+        }
+
+
+        // Student Portal functions
+        function startDiagnostic() {
+            document.getElementById('diagnosticTest').classList.add('hidden');
+            document.getElementById('quizInterface').classList.remove('hidden');
+            
+            currentQuiz = {
+                questions: sampleQuestions,
+                answers: [],
+                type: 'diagnostic'
+            };
+            
+            questionIndex = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = currentQuiz.questions[questionIndex];
+            const container = document.getElementById('currentQuestion');
+            
+            container.innerHTML = `
+                <div class="question-card">
+                    <div class="question-number">${questionIndex + 1}</div>
+                    <h3>${question.question}</h3>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <div class="option" onclick="selectOption(${index})" data-index="${index}">
+                                ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            updateProgress();
+        }
+
+        function selectOption(index) {
+            // Remove previous selections
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            document.querySelector([data-index="${index}"]).classList.add('selected');
+            
+            // Store answer
+            if (!currentQuiz.answers[questionIndex]) {
+                currentQuiz.answers[questionIndex] = {};
+            }
+            currentQuiz.answers[questionIndex].selected = index;
+            
+            // Show feedback
+            showFeedback(index);
+        }
+
+        function showFeedback(selectedIndex) {
+            const question = currentQuiz.questions[questionIndex];
+            const feedbackPanel = document.getElementById('feedbackPanel');
+            const feedbackText = document.getElementById('feedbackText');
+            
+            const isCorrect = selectedIndex === question.correct;
+            
+            feedbackText.innerHTML = `
+                <strong>${isCorrect ? '✅ Correct!' : '❌ Incorrect'}</strong><br>
+                ${question.explanation}
+            `;
+            
+            feedbackPanel.classList.remove('hidden');
+            
+            // Update option styling
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                if (index === question.correct) {
+                    opt.classList.add('correct');
+                } else if (index === selectedIndex && !isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+        }
+
+        function nextQuestion() {
+            questionIndex++;
+            
+            if (questionIndex < currentQuiz.questions.length) {
+                showQuestion();
+                document.getElementById('feedbackPanel').classList.add('hidden');
+            } else {
+                document.getElementById('nextButton').style.display = 'none';
+                document.getElementById('submitQuiz').style.display = 'inline-block';
+            }
+        }
+
+        function submitQuiz() {
+            const score = calculateScore();
+            
+            // Store quiz results
+            const quizResult = {
+                type: currentQuiz.type,
+                score: score,
+                totalQuestions: currentQuiz.questions.length,
+                answers: currentQuiz.answers,
+                timestamp: new Date(),
+                subject: currentQuiz.subject || 'General'
+            };
+            
+            studentData.quizzes.push(quizResult);
+            
+            if (currentQuiz.type === 'diagnostic') {
+                studentData.diagnosticComplete = true;
+                showDiagnosticResults(score);
+            } else {
+                showQuizResults(score);
+            }
+        }
+
+        function calculateScore() {
+            let correct = 0;
+            currentQuiz.answers.forEach((answer, index) => {
+                if (answer && answer.selected === currentQuiz.questions[index].correct) {
+                    correct++;
+                }
+            });
+            return Math.round((correct / currentQuiz.questions.length) * 100);
+        }
+
+        function showDiagnosticResults(score) {
+            const container = document.getElementById('currentQuestion');
+            let level = 'Beginner';
+            let recommendations = [];
+            
+            if (score >= 80) {
+                level = 'Advanced';
+                recommendations = ['Take advanced courses', 'Try challenging practice sets', 'Consider tutoring others'];
+            } else if (score >= 60) {
+                level = 'Intermediate';
+                recommendations = ['Focus on weak areas', 'Regular practice sessions', 'Join study groups'];
+            } else {
+                level = 'Beginner';
+                recommendations = ['Start with fundamentals', 'Take more time with basics', 'Use visual learning aids'];
+            }
+            
+            container.innerHTML = `
+                <div class="question-card" style="text-align: center;">
+                    <h2>🎯 Diagnostic Results</h2>
+                    <div style="font-size: 3rem; color: #667eea; margin: 20px 0;">${score}%</div>
+                    <h3>Your Level: ${level}</h3>
+                    <div style="margin: 20px 0;">
+                        <h4>Personalized Recommendations:</h4>
+                        <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+                            ${recommendations.map(rec => <li style="margin: 10px 0;">${rec}</li>).join('')}
+                        </ul>
+                    </div>
+                    <button class="btn" onclick="showStudentDashboard()">Continue to Dashboard</button>
+                </div>
+            `;
+            
+            document.getElementById('feedbackPanel').classList.add('hidden');
+            document.getElementById('nextButton').style.display = 'none';
+            document.getElementById('submitQuiz').style.display = 'none';
+        }
+
+        function showQuizResults(score) {
+            const container = document.getElementById('currentQuestion');
+            const performance = score >= 80 ? 'Excellent!' : score >= 60 ? 'Good!' : 'Needs Improvement';
+            const emoji = score >= 80 ? '🌟' : score >= 60 ? '👍' : '📚';
+            
+            container.innerHTML = `
+                <div class="question-card" style="text-align: center;">
+                    <h2>${emoji} Quiz Complete!</h2>
+                    <div style="font-size: 3rem; color: #667eea; margin: 20px 0;">${score}%</div>
+                    <h3>${performance}</h3>
+                    <p>You scored ${score}% on this ${currentQuiz.subject} quiz.</p>
+                    <button class="btn" onclick="showStudentDashboard()">Back to Dashboard</button>
+                    <button class="btn btn-secondary" onclick="retakeQuiz()">Retake Quiz</button>
+                </div>
+            `;
+            
+            updateStudentStats();
+        }
+
+        function showStudentDashboard() {
+            document.getElementById('quizInterface').classList.add('hidden');
+            document.getElementById('studentDashboard').classList.remove('hidden');
+            document.getElementById('diagnosticTest').classList.add('hidden');
+            
+            updateStudentStats();
+            loadCourses();
+            initializeProgressChart();
+        }
+
+        function updateStudentStats() {
+            const totalQuizzes = studentData.quizzes.length;
+            const averageScore = totalQuizzes > 0 ? 
+                Math.round(studentData.quizzes.reduce((sum, quiz) => sum + quiz.score, 0) / totalQuizzes) : 0;
+            const currentStreak = calculateStreak();
+            const level = averageScore >= 80 ? 'Advanced' : averageScore >= 60 ? 'Intermediate' : 'Beginner';
+            
+            document.getElementById('totalQuizzes').textContent = totalQuizzes;
+            document.getElementById('averageScore').textContent = averageScore + '%';
+            document.getElementById('currentStreak').textContent = currentStreak;
+            document.getElementById('nextLevel').textContent = level;
+        }
+
+        function calculateStreak() {
+            // Simulate streak calculation
+            return Math.floor(Math.random() * 10) + 1;
+        }
+
+        function loadCourses() {
+            const courseGrid = document.getElementById('courseGrid');
+            const courses = [
+                { name: 'Mathematics', progress: 75, nextTopic: 'Calculus', difficulty: 'Intermediate' },
+                { name: 'Physics', progress: 60, nextTopic: 'Mechanics', difficulty: 'Advanced' },
+                { name: 'Chemistry', progress: 90, nextTopic: 'Organic Chemistry', difficulty: 'Beginner' },
+                { name: 'Biology', progress: 45, nextTopic: 'Cell Structure', difficulty: 'Intermediate' }
+            ];
+            
+            courseGrid.innerHTML = courses.map(course => `
+                <div class="course-card">
+                    <h3>${course.name}</h3>
+                    <p><strong>Progress:</strong> ${course.progress}%</p>
+                    <p><strong>Next Topic:</strong> ${course.nextTopic}</p>
+                    <p><strong>Difficulty:</strong> ${course.difficulty}</p>
+                    <div class="progress-bar" style="margin: 10px 0;">
+                        <div class="progress-fill" style="width: ${course.progress}%"></div>
+                    </div>
+                    <button class="btn" onclick="startCourseQuiz('${course.name}')">Start Quiz</button>
+                </div>
+            `).join('');
+        }
+
+        function startCourseQuiz(courseName) {
+            document.getElementById('studentDashboard').classList.add('hidden');
+            document.getElementById('quizInterface').classList.remove('hidden');
+            
+            // Generate course-specific questions
+            currentQuiz = {
+                questions: generateCourseQuestions(courseName),
+                answers: [],
+                type: 'course',
+                subject: courseName
+            };
+            
+            questionIndex = 0;
+            showQuestion();
+        }
+
+        function generateCourseQuestions(courseName) {
+            const questionSets = {
+                'Mathematics': [
+                    {
+                        question: "What is the integral of 2x?",
+                        options: ["x²", "x² + C", "2x²", "2x² + C"],
+                        correct: 1,
+                        explanation: "The integral of 2x is x² + C, where C is the constant of integration."
+                    },
+                    {
+                        question: "Solve for x: 2x + 5 = 15",
+                        options: ["5", "10", "7.5", "20"],
+                        correct: 0,
+                        explanation: "2x + 5 = 15, so 2x = 10, therefore x = 5."
+                    }
+                ],
+                'Physics': [
+                    {
+                        question: "What is Newton's second law?",
+                        options: ["F = ma", "E = mc²", "v = u + at", "s = ut + ½at²"],
+                        correct: 0,
+                        explanation: "Newton's second law states that Force equals mass times acceleration (F = ma)."
+                    },
+                    {
+                        question: "What is the unit of energy?",
+                        options: ["Watt", "Joule", "Newton", "Pascal"],
+                        correct: 1,
+                        explanation: "The SI unit of energy is the Joule (J)."
+                    }
+                ],
+                'Chemistry': [
+                    {
+                        question: "What is the atomic number of Carbon?",
+                        options: ["4", "6", "8", "12"],
+                        correct: 1,
+                        explanation: "Carbon has an atomic number of 6, meaning it has 6 protons."
+                    },
+                    {
+                        question: "What is the chemical formula for water?",
+                        options: ["H₂O", "CO₂", "NaCl", "CH₄"],
+                        correct: 0,
+                        explanation: "Water has the chemical formula H₂O - two hydrogen atoms and one oxygen atom."
+                    }
+                ],
+                'Biology': [
+                    {
+                        question: "What is the powerhouse of the cell?",
+                        options: ["Nucleus", "Ribosome", "Mitochondria", "Chloroplast"],
+                        correct: 2,
+                        explanation: "Mitochondria are called the powerhouse of the cell because they produce ATP energy."
+                    },
+                    {
+                        question: "What is DNA?",
+                        options: ["Protein", "Carbohydrate", "Lipid", "Nucleic Acid"],
+                        correct: 3,
+                        explanation: "DNA (Deoxyribonucleic Acid) is a nucleic acid that carries genetic information."
+                    }
+                ]
+            };
+            
+            return questionSets[courseName] || sampleQuestions;
+        }
+
+        function retakeQuiz() {
+            questionIndex = 0;
+            currentQuiz.answers = [];
+            document.getElementById('feedbackPanel').classList.add('hidden');
+            document.getElementById('nextButton').style.display = 'inline-block';
+            document.getElementById('submitQuiz').style.display = 'none';
+            showQuestion();
+        }
+
+        function updateProgress() {
+            const progress = ((questionIndex + 1) / currentQuiz.questions.length) * 100;
+            document.getElementById('quizProgress').style.width = progress + '%';
+        }
+
+        function initializeProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Quiz Scores (%)',
+                        data: [65, 72, 78, 85, 82, 90],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Educator Dashboard functions
+        function initializeEducatorDashboard() {
+            updateEducatorStats();
+            initializeClassPerformanceChart();
+            initializeProgressTrendsChart();
+            loadStudentResults();
+        }
+
+        function updateEducatorStats() {
+            // Simulate educator statistics
+            document.getElementById('totalStudents').textContent = '127';
+            document.getElementById('totalCourses').textContent = '8';
+            document.getElementById('avgClassScore').textContent = '83%';
+            document.getElementById('completionRate').textContent = '94%';
+        }
+
+        function initializeClassPerformanceChart() {
+            const ctx = document.getElementById('classPerformanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excellent (90-100%)', 'Good (80-89%)', 'Fair (70-79%)', 'Needs Improvement (<70%)'],
+                    datasets: [{
+                        data: [25, 45, 20, 10],
+                        backgroundColor: ['#48bb78', '#667eea', '#ed8936', '#f56565'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeProgressTrendsChart() {
+            const ctx = document.getElementById('progressTrendsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History'],
+                    datasets: [{
+                        label: 'Average Score (%)',
+                        data: [85, 78, 92, 88, 81, 76],
+                        backgroundColor: ['#667eea', '#48bb78', '#ed8936', '#9f7aea', '#38b2ac', '#f56565'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadStudentResults() {
+            const container = document.getElementById('studentResults');
